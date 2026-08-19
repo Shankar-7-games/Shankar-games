@@ -3,134 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tashan Games - Pro</title>
+    <title>Tashan Games - Super Beast Edition</title>
+    
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@300;400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@300;400;500;600&display=swap');
         
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; user-select: none; }
-        
-        body { background: #050810; color: #e2e8f0; min-height: 100vh; overflow-x: hidden; }
+        body { background: #070a13; color: #e2e8f0; min-height: 100vh; overflow-x: hidden; }
 
-        /* --- Animations --- */
+        /* --- Reusable Premium UI --- */
+        .glass-panel { background: rgba(21, 27, 43, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(0, 210, 211, 0.15); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+        .btn-primary { background: linear-gradient(135deg, #00d2d3, #0984e3); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; width: 100%; font-size: 15px; box-shadow: 0 5px 20px rgba(0,210,211,0.25); text-transform: uppercase; letter-spacing: 1px;}
+        .btn-primary:active { transform: scale(0.96); }
+        .btn-outline { background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 15px; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.3s; }
+        
+        .input-group { margin-bottom: 18px; text-align: left; }
+        .input-label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-box { width: 100%; padding: 15px; background: #0b0f19; border: 1px solid #1e293b; border-radius: 12px; color: #fff; outline: none; font-size: 14px; transition: 0.3s; }
+        .input-box:focus { border-color: #00d2d3; box-shadow: 0 0 15px rgba(0,210,211,0.1); }
+
+        /* --- Screens & Nav --- */
+        .screen { display: none; padding: 15px; padding-bottom: 90px; min-height: 100vh; animation: fadeIn 0.4s ease; }
+        .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- Reusable UI --- */
-        .glass-panel { background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(15px); border: 1px solid rgba(0, 210, 211, 0.2); border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
-        .btn-primary { background: linear-gradient(90deg, #00d2d3, #0984e3); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px; transition: 0.3s; width: 100%; box-shadow: 0 4px 20px rgba(0,210,211,0.3); font-size: 15px;}
-        .btn-primary:active { transform: scale(0.96); box-shadow: 0 2px 10px rgba(0,210,211,0.2); }
+        header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(7, 10, 19, 0.95); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .head-left { font-family: 'Orbitron', sans-serif; font-size: 20px; color: #fff; font-weight: bold; text-shadow: 0 0 15px rgba(0,210,211,0.3);}
+        .head-left span { color: #00d2d3; }
+        .wallet-badge { background: #151b2b; padding: 6px 15px; border-radius: 20px; border: 1px solid #f1c40f; color: #f1c40f; font-weight: 600; display: flex; align-items: center; gap: 5px; box-shadow: 0 0 10px rgba(241,196,15,0.1);}
         
-        /* Input Fields Styling */
-        .input-group { margin-bottom: 20px; text-align: left; }
-        .input-label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-        .input-box { width: 100%; padding: 15px; background: rgba(0,0,0,0.4); border: 1px solid #334155; border-radius: 10px; color: #fff; outline: none; font-size: 15px; transition: 0.3s; }
-        .input-box:focus { border-color: #00d2d3; box-shadow: 0 0 15px rgba(0,210,211,0.2); background: rgba(0,0,0,0.6); }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(7, 10, 19, 0.98); backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; }
+        .nav-item { text-align: center; color: #64748b; font-size: 11px; cursor: pointer; flex: 1; transition: 0.3s; }
+        .nav-icon { font-size: 22px; margin-bottom: 4px; display: block; opacity: 0.5; transition: 0.3s; }
+        .nav-item.active { color: #00d2d3; font-weight: 600; }
+        .nav-item.active .nav-icon { opacity: 1; transform: translateY(-4px); text-shadow: 0 0 15px rgba(0,210,211,0.6); }
 
-        /* --- Screens Setup --- */
-        .screen { display: none; padding: 20px; padding-bottom: 80px; min-height: 100vh; animation: fadeIn 0.4s ease-out; }
-        .screen.active { display: block; }
+        /* --- Game Board & Profile UI --- */
+        .game-banner { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 25px 20px; border-radius: 16px; border: 1px solid #00d2d3; margin-bottom: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,210,211,0.15); cursor: pointer; }
+        .game-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 15px; }
+        .period-id { font-family: monospace; color: #f1c40f; font-size: 14px; }
+        .timer { font-size: 45px; font-family: 'Orbitron', sans-serif; color: #00d2d3; margin: 10px 0; text-shadow: 0 0 20px rgba(0,210,211,0.4); }
+        .bet-buttons { display: flex; gap: 15px; margin-top: 20px; }
+        .b-btn { flex: 1; padding: 18px; font-size: 20px; font-weight: bold; border: none; border-radius: 12px; color: white; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: 0.2s; }
+        .btn-big { background: linear-gradient(135deg, #10ac84, #1dd1a1); box-shadow: 0 5px 15px rgba(16, 172, 132, 0.3); }
+        .btn-small { background: linear-gradient(135deg, #341f97, #5f27cd); box-shadow: 0 5px 15px rgba(95, 39, 205, 0.3); }
         
-        /* --- Auth Pages (Login & Register) --- */
-        .auth-container { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; position: relative; overflow: hidden; }
+        .pro-header { display: flex; align-items: center; gap: 20px; padding: 25px 20px; background: linear-gradient(to right, #151b2b, #0f172a); border-radius: 20px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); }
+        .pro-img { width: 80px; height: 80px; border-radius: 50%; background: #1e293b; border: 3px solid #00d2d3; box-shadow: 0 0 20px rgba(0,210,211,0.4); }
+        .pro-details h2 { font-size: 20px; margin-bottom: 4px; color: #fff; font-weight: 600;}
+        .pro-details p { font-size: 13px; color: #94a3b8; font-family: monospace; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 6px; display: inline-block;}
         
-        /* Background Glow Effects */
-        .bg-glow-1 { position: absolute; top: -10%; left: -10%; width: 300px; height: 300px; background: rgba(0, 210, 211, 0.15); filter: blur(80px); border-radius: 50%; z-index: -1; }
-        .bg-glow-2 { position: absolute; bottom: -10%; right: -10%; width: 300px; height: 300px; background: rgba(9, 132, 227, 0.15); filter: blur(80px); border-radius: 50%; z-index: -1; }
+        .wallet-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .w-card { background: #151b2b; padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); text-align: center; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden;}
+        .w-card-deposit { background: linear-gradient(135deg, rgba(16, 172, 132, 0.1), rgba(29, 209, 161, 0.05)); border: 1px solid rgba(16, 172, 132, 0.3); }
+        .w-card-withdraw { background: linear-gradient(135deg, rgba(255, 71, 87, 0.1), rgba(255, 107, 129, 0.05)); border: 1px solid rgba(255, 71, 87, 0.3); }
+        .w-icon { font-size: 28px; margin-bottom: 10px; display: block; }
+        .w-title { font-size: 14px; font-weight: 600; color: #fff; }
 
-        .auth-card { padding: 40px 30px; width: 100%; max-width: 400px; text-align: center; }
-        .brand-logo { font-family: 'Orbitron', sans-serif; font-size: 36px; color: #fff; margin-bottom: 5px; letter-spacing: 2px; }
-        .brand-logo span { color: #00d2d3; text-shadow: 0 0 15px rgba(0,210,211,0.6); }
-        .auth-subtitle { color: #64748b; font-size: 14px; margin-bottom: 30px; }
-
-        .auth-footer { margin-top: 25px; font-size: 13px; color: #94a3b8; }
-        .auth-link { color: #00d2d3; font-weight: bold; cursor: pointer; text-decoration: none; transition: 0.2s; }
-        .auth-link:active { opacity: 0.7; }
-
-        /* --- Header & Bottom Nav (From previous version) --- */
-        header { padding: 15px; display: flex; justify-content: space-between; align-items: center; background: rgba(11, 17, 32, 0.9); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #1e293b; }
-        .head-left { font-family: 'Orbitron', sans-serif; font-size: 18px; color: #fff; font-weight: bold;}
-        .wallet-badge { background: #1e293b; padding: 5px 15px; border-radius: 20px; border: 1px solid #f1c40f; color: #f1c40f; font-weight: 600; }
+        /* --- Banking UI & History --- */
+        .page-title { font-size: 20px; font-weight: 600; margin-bottom: 25px; display: flex; align-items: center; gap: 15px; }
+        .back-btn { background: #151b2b; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; color: #fff; border: 1px solid rgba(255,255,255,0.1);}
         
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(11, 17, 32, 0.95); backdrop-filter: blur(10px); border-top: 1px solid #1e293b; display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
-        .nav-item { text-align: center; color: #64748b; font-size: 12px; cursor: pointer; flex: 1; }
-        .nav-item.active { color: #00d2d3; font-weight: bold; }
+        .finance-card { background: #151b2b; padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .fc-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         
-        /* Basic Main UI Elements */
-        .game-banner { background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1614680376573-e3436ce69d66?auto=format&fit=crop&w=500&q=80') center/cover; height: 160px; border-radius: 15px; margin-bottom: 20px; display: flex; align-items: flex-end; padding: 15px; border: 1px solid #334155;}
-        .game-banner h2 { font-family: 'Orbitron', sans-serif; color: #fff; font-size: 24px;}
-        .logout-btn { background: rgba(255, 71, 87, 0.1); border: 1px solid #ff4757; color: #ff4757; padding: 12px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .history-list { display: flex; flex-direction: column; gap: 12px; }
+        .txn-item { background: #151b2b; padding: 15px 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #334155; }
+        .txn-item.tx-dep { border-left-color: #2ecc71; }
+        .txn-item.tx-wit { border-left-color: #f1c40f; }
+        .txn-id { font-size: 13px; color: #fff; font-family: monospace; font-weight: bold; margin-bottom: 3px; display: block;}
+        .txn-date { font-size: 11px; color: #64748b; }
+        .txn-amt { font-size: 16px; font-weight: bold; }
+        .txn-status { font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: bold; margin-top: 5px; display: inline-block; text-transform: uppercase;}
+
+        .auth-container { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .auth-card { width: 100%; max-width: 400px; padding: 40px 30px; text-align: center; }
     </style>
 </head>
 <body>
 
-    <!-- AUTHENTICATION WRAPPER -->
+    <!-- AUTH WRAPPER -->
     <div id="authWrapper">
-        
-        <!-- 1. LOGIN SCREEN -->
         <div id="loginScreen" class="auth-container active">
-            <div class="bg-glow-1"></div>
-            <div class="bg-glow-2"></div>
-            
             <div class="glass-panel auth-card">
-                <div class="brand-logo">TASHAN<span>PRO</span></div>
-                <div class="auth-subtitle">Secure Login to your account</div>
-
-                <div class="input-group">
-                    <span class="input-label">Mobile Number</span>
-                    <input type="number" id="logPhone" class="input-box" placeholder="Enter 10-digit number">
-                </div>
-                
-                <div class="input-group">
-                    <span class="input-label">Password</span>
-                    <input type="password" id="logPwd" class="input-box" placeholder="Enter your password">
-                </div>
-
-                <button class="btn-primary" onclick="doLogin()">Secure Login</button>
-
-                <div class="auth-footer">
-                    New to Tashan Pro? <br><br>
-                    <span class="auth-link" onclick="switchAuth('register')">Create New Account →</span>
-                </div>
+                <h1 style="font-family: 'Orbitron'; margin-bottom: 5px; font-size: 32px;">TASHAN<span style="color:#00d2d3">PRO</span></h1>
+                <p style="color:#94a3b8; font-size:13px; margin-bottom:30px;">Supabase Live Server</p>
+                <div class="input-group"><input type="number" id="logPhone" class="input-box" placeholder="Mobile Number"></div>
+                <div class="input-group"><input type="password" id="logPwd" class="input-box" placeholder="Password"></div>
+                <button class="btn-primary" onclick="doLogin()" id="loginBtnText">Secure Login</button>
+                <p style="margin-top:25px; font-size:13px; color:#94a3b8;">New User? <span style="color:#00d2d3; cursor:pointer; font-weight:bold;" onclick="switchAuth('register')">Create Account</span></p>
             </div>
         </div>
 
-        <!-- 2. REGISTER SCREEN (Hidden by default) -->
         <div id="registerScreen" class="auth-container" style="display: none;">
-            <div class="bg-glow-1"></div>
-            <div class="bg-glow-2"></div>
-            
             <div class="glass-panel auth-card">
-                <div class="brand-logo">TASHAN<span>PRO</span></div>
-                <div class="auth-subtitle">Register to start winning</div>
-
-                <div class="input-group">
-                    <span class="input-label">Full Name</span>
-                    <input type="text" id="regName" class="input-box" placeholder="What should we call you?">
-                </div>
-
-                <div class="input-group">
-                    <span class="input-label">Mobile Number</span>
-                    <input type="number" id="regPhone" class="input-box" placeholder="Enter 10-digit number">
-                </div>
-                
-                <div class="input-group">
-                    <span class="input-label">Create Password</span>
-                    <input type="password" id="regPwd" class="input-box" placeholder="Set a strong password">
-                </div>
-
-                <button class="btn-primary" onclick="doRegister()">Create Account</button>
-
-                <div class="auth-footer">
-                    Already have an account? <br><br>
-                    <span class="auth-link" onclick="switchAuth('login')">← Back to Login</span>
-                </div>
+                <h1 style="font-family: 'Orbitron'; margin-bottom: 5px; font-size: 32px;">TASHAN<span style="color:#00d2d3">PRO</span></h1>
+                <p style="color:#94a3b8; font-size:13px; margin-bottom:30px;">Register to Database</p>
+                <div class="input-group"><input type="text" id="regName" class="input-box" placeholder="Full Name"></div>
+                <div class="input-group"><input type="number" id="regPhone" class="input-box" placeholder="Mobile Number"></div>
+                <div class="input-group"><input type="password" id="regPwd" class="input-box" placeholder="Create Password"></div>
+                <button class="btn-primary" onclick="doRegister()" id="regBtnText">Create Account</button>
+                <p style="margin-top:25px; font-size:13px; color:#94a3b8;">Already a user? <span style="color:#00d2d3; cursor:pointer; font-weight:bold;" onclick="switchAuth('login')">Login</span></p>
             </div>
         </div>
-
     </div>
 
-    <!-- MAIN APP CONTAINER (Hidden until logged in) -->
+    <!-- MAIN APP -->
     <div id="mainApp" style="display: none;">
-        
         <header>
             <div class="head-left">TASHAN<span>PRO</span></div>
             <div class="wallet-badge"><span id="hdrPoints">0</span> 🪙</div>
@@ -138,144 +120,399 @@
 
         <!-- LOBBY SCREEN -->
         <div id="lobbyScreen" class="screen active">
-            <h3 style="margin-bottom: 15px; color: #94a3b8; font-size: 14px;">🔥 Trending Games</h3>
-            <div class="game-banner" onclick="alert('Game opening soon...')">
-                <div>
-                    <h2>BIG / SMALL</h2>
-                    <p style="color:#00d2d3; font-size: 12px; margin-top: 5px;">Live 24/7 • Guess & Win</p>
+            <h3 style="color: #94a3b8; font-size: 12px; margin-bottom: 15px; text-transform: uppercase;">Live Casino Server</h3>
+            
+            <div class="game-banner">
+                <div class="game-header">
+                    <span style="color: #fff; font-weight: bold; font-size: 18px;">BIG / SMALL</span>
+                    <div class="period-id">ID: <span id="dispPeriod">Loading...</span></div>
+                </div>
+                <div class="timer" id="dispTimer">30</div>
+                <p id="betStatus" style="color: #94a3b8; font-size: 13px; min-height: 20px;">Place your points now!</p>
+                
+                <div class="bet-buttons">
+                    <button class="b-btn btn-big" id="btnBig" onclick="placeBet('Big')">BIG</button>
+                    <button class="b-btn btn-small" id="btnSmall" onclick="placeBet('Small')">SMALL</button>
                 </div>
             </div>
-            <p style="text-align: center; color: #64748b; font-size: 12px; margin-top: 30px;">More games loading...</p>
+
+            <div style="background: #151b2b; border-radius: 16px; padding: 15px; border: 1px solid rgba(255,255,255,0.05);">
+                <h4 style="color: #fff; font-size: 14px; margin-bottom: 10px;">Live Results</h4>
+                <div id="gameHistoryList" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px;"></div>
+            </div>
         </div>
 
         <!-- PROFILE SCREEN -->
         <div id="profileScreen" class="screen">
-            <div class="glass-panel" style="text-align: center; padding: 30px 20px;">
-                <h2 id="proName" style="margin-bottom: 5px;">User Name</h2>
-                <div style="color: #64748b; font-size: 14px; margin-bottom: 20px;" id="proPhone">+91 ******</div>
-                <button class="logout-btn" onclick="logout()">Logout Securely</button>
+            <div class="pro-header">
+                <img src="" alt="Avatar" class="pro-img" id="proAvatarImg">
+                <div class="pro-details">
+                    <h2 id="proName">Loading...</h2>
+                    <p id="proPhone">+91 ******</p>
+                </div>
             </div>
+
+            <div class="wallet-container">
+                <div class="w-card w-card-deposit" onclick="openBanking('deposit')">
+                    <span class="w-icon">📥</span><span class="w-title">Deposit</span>
+                </div>
+                <div class="w-card w-card-withdraw" onclick="openBanking('withdraw')">
+                    <span class="w-icon">📤</span><span class="w-title">Withdraw</span>
+                </div>
+            </div>
+
+            <div class="glass-panel" style="padding: 20px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <span style="color: #94a3b8; font-size: 14px;">Security Status</span>
+                    <span style="color: #2ecc71; font-weight: bold; font-size: 14px;">Cloud DB ✔</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: #94a3b8; font-size: 14px;">Bank Status</span>
+                    <span id="bankStatusText" style="color: #f1c40f; font-weight: bold; font-size: 14px;">Not Linked</span>
+                </div>
+            </div>
+
+            <button class="btn-outline" style="border-color: rgba(255, 71, 87, 0.5); color: #ff4757;" onclick="logout()">Logout Account</button>
         </div>
 
-        <!-- BOTTOM NAVIGATION -->
+        <!-- BANKING SCREEN -->
+        <div id="bankingScreen" class="screen">
+            <div class="page-title">
+                <div class="back-btn" onclick="closeBanking()">←</div>
+                <span id="bankingTitle">Finance Portal</span>
+            </div>
+
+            <div id="bankSetupSection" class="finance-card" style="display: none;">
+                <h3 style="color: #00d2d3; margin-bottom: 10px; font-size: 18px;">Link Bank Account</h3>
+                <p style="font-size: 12px; color: #94a3b8; margin-bottom: 20px; line-height: 1.5;">Unique Bank Policy: One bank account can only be linked to a single user.</p>
+                <div class="input-group">
+                    <input type="number" id="bankAcc" class="input-box" placeholder="Enter Account Number">
+                </div>
+                <button class="btn-primary" onclick="saveBankDetails()" id="btnLinkBank">Verify & Link Bank</button>
+            </div>
+
+            <div id="transactionSection" class="finance-card" style="display: none;">
+                <div class="fc-head">
+                    <span style="font-size: 16px; font-weight: 600; color: #fff;" id="txTypeTitle">Action</span>
+                    <span style="font-size: 20px; font-family: 'Orbitron'; color: #f1c40f;">🪙 <span id="txBalance">0</span></span>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="txAmount" class="input-box" placeholder="Enter Amount">
+                </div>
+                <button class="btn-primary" id="txBtn" onclick="processTransaction()">Submit Request</button>
+            </div>
+
+            <h3 style="color: #94a3b8; font-size: 14px; margin-bottom: 15px; text-transform: uppercase;">Transaction History</h3>
+            <div class="history-list" id="historyList"></div>
+        </div>
+
+        <!-- BOTTOM NAV -->
         <div class="bottom-nav" id="bottomNav">
-            <div class="nav-item active" id="navGames" onclick="switchMainTab('lobbyScreen', 'navGames')">🎮 Games</div>
-            <div class="nav-item" id="navProfile" onclick="switchMainTab('profileScreen', 'navProfile')">👤 Profile</div>
+            <div class="nav-item active" id="navGames" onclick="switchMainTab('lobbyScreen', 'navGames')"><span class="nav-icon">🎰</span> Casino</div>
+            <div class="nav-item" id="navProfile" onclick="switchMainTab('profileScreen', 'navProfile')"><span class="nav-icon">👤</span> Account</div>
         </div>
-
     </div>
 
     <script>
-        // --- Database Setup ---
-        // गिटहब पर वेबसाइट है, इसलिए हम लोकल स्टोरेज को ही सर्वर मानेंगे
-        let db = JSON.parse(localStorage.getItem('tashan_database')) || {};
-        let activeUserPhone = localStorage.getItem('tashan_active_session');
-        let user = null;
+        // --- 1. SUPABASE INITIALIZATION (SUPER BEAST) ---
+        const { createClient } = supabase;
+        const supabaseUrl = 'https://fyuqmahnzczbyndgsnru.supabase.co';
+        const supabaseKey = 'Sb_publishable_1TjUgdc0FOhvl5nFLp_XuA_dKKVKqX1';
+        const db = createClient(supabaseUrl, supabaseKey);
 
-        // Auto-Login Check on Page Load
-        window.onload = () => {
-            if(activeUserPhone && db[activeUserPhone]) {
-                user = db[activeUserPhone];
-                showMainApp();
+        let user = null;
+        let activeBet = null;
+        let currentTxType = '';
+        let currentPeriodStr = '';
+
+        // Auto-login check on page load
+        window.onload = async () => {
+            let sessionPhone = localStorage.getItem('tashan_active_session');
+            if(sessionPhone) {
+                // Fetch fresh data from Supabase
+                const { data, error } = await db.from('tashan_users').select('*').eq('phone', sessionPhone).single();
+                if(data && !error) {
+                    user = data;
+                    if(!user.history) user.history = []; // Default fix
+                    showMainApp();
+                    startGameEngine();
+                } else {
+                    localStorage.removeItem('tashan_active_session');
+                }
             }
         };
 
-        // --- Smooth Screen Switcher ---
+        // --- 2. AUTHENTICATION ---
         function switchAuth(type) {
-            const login = document.getElementById('loginScreen');
-            const register = document.getElementById('registerScreen');
-            
-            // Fade out effect
-            login.style.opacity = '0';
-            register.style.opacity = '0';
-
-            setTimeout(() => {
-                if(type === 'login') {
-                    login.style.display = 'flex';
-                    register.style.display = 'none';
-                    setTimeout(() => login.style.opacity = '1', 50);
-                } else {
-                    login.style.display = 'none';
-                    register.style.display = 'flex';
-                    setTimeout(() => register.style.opacity = '1', 50);
-                }
-            }, 300); // 300ms transition time
+            document.getElementById('loginScreen').style.display = type === 'login' ? 'flex' : 'none';
+            document.getElementById('registerScreen').style.display = type === 'register' ? 'flex' : 'none';
         }
 
-        // --- Registration Logic ---
-        function doRegister() {
+        async function doRegister() {
             let name = document.getElementById('regName').value.trim();
             let phone = document.getElementById('regPhone').value.trim();
             let pwd = document.getElementById('regPwd').value;
 
-            if(!name || !phone || !pwd) return alert("Please fill all details!");
-            if(phone.length !== 10) return alert("Mobile number must be 10 digits!");
-            
-            if(db[phone]) {
-                alert("This number is already registered! Please Login.");
-                switchAuth('login');
-                return;
+            if(!name || !phone || !pwd) return alert("Fill all details!");
+            document.getElementById('regBtnText').innerText = "Processing...";
+
+            // Check if user exists
+            const { data: existingUser } = await db.from('tashan_users').select('phone').eq('phone', phone).single();
+            if(existingUser) {
+                document.getElementById('regBtnText').innerText = "Create Account";
+                return alert("Number already registered!");
             }
 
-            // Save to "Database"
-            let uid = 'TSN' + Math.floor(100000 + Math.random() * 900000);
-            db[phone] = { phone: phone, name: name, password: pwd, uid: uid, balance: 100 };
-            localStorage.setItem('tashan_database', JSON.stringify(db));
+            let avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}&backgroundColor=1e293b`;
+
+            // Insert into Supabase
+            const { error } = await db.from('tashan_users').insert([{ 
+                phone: phone, name: name, password: pwd, avatar: avatarUrl, balance: 500, bank_linked: false, history: []
+            }]);
+
+            document.getElementById('regBtnText').innerText = "Create Account";
+
+            if(error) return alert("Supabase Error: Please make sure you have created the 'tashan_users' table exactly as told!");
+
+            alert("Account Created! 500 Points Added to Live DB.");
             
-            alert("Account Created Successfully! You got 100 Bonus Points.");
+            // Login directly after registering
+            user = { phone: phone, name: name, password: pwd, avatar: avatarUrl, balance: 500, bank_linked: false, history: [] };
             loginSuccess(phone);
         }
 
-        // --- Login Logic ---
-        function doLogin() {
+        async function doLogin() {
             let phone = document.getElementById('logPhone').value.trim();
             let pwd = document.getElementById('logPwd').value;
-
-            if(!phone || !pwd) return alert("Enter number and password!");
             
-            if(db[phone]) {
-                if(db[phone].password === pwd) {
-                    loginSuccess(phone);
-                } else {
-                    alert("Incorrect Password!");
-                }
+            if(!phone || !pwd) return alert("Enter details!");
+            document.getElementById('loginBtnText').innerText = "Authenticating...";
+
+            const { data: userData, error } = await db.from('tashan_users').select('*').eq('phone', phone).single();
+            document.getElementById('loginBtnText').innerText = "Secure Login";
+
+            if(error || !userData) return alert("Account not found in Database!");
+            
+            if(userData.password === pwd) {
+                user = userData;
+                if(!user.history) user.history = []; // Fallback for safety
+                loginSuccess(phone);
             } else {
-                alert("Account not found! Please create a new account.");
+                alert("Incorrect Password!");
             }
         }
 
         function loginSuccess(phone) {
-            user = db[phone];
-            localStorage.setItem('tashan_active_session', phone); // Save session
+            localStorage.setItem('tashan_active_session', phone);
             showMainApp();
+            startGameEngine();
         }
 
         function logout() {
-            if(confirm("Are you sure you want to logout?")) {
-                localStorage.removeItem('tashan_active_session'); // Delete session
-                location.reload(); // Refresh page to show login screen
-            }
+            localStorage.removeItem('tashan_active_session');
+            location.reload();
         }
 
-        // --- Main App Logic ---
+        async function saveUserToDB() {
+            // Update Supabase Database Row
+            await db.from('tashan_users').update({ balance: user.balance, history: user.history, bank_linked: user.bank_linked }).eq('phone', user.phone);
+            updateUI();
+        }
+
+        // --- 3. UI MANAGEMENT ---
         function showMainApp() {
             document.getElementById('authWrapper').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
-            
-            // Update Data in UI
+            updateUI();
+        }
+
+        function updateUI() {
             document.getElementById('hdrPoints').innerText = user.balance;
+            document.getElementById('proAvatarImg').src = user.avatar;
             document.getElementById('proName').innerText = user.name;
             document.getElementById('proPhone').innerText = `+91 ${user.phone}`;
+            
+            if(user.bank_linked) {
+                document.getElementById('bankStatusText').innerText = "Linked ✔";
+                document.getElementById('bankStatusText').style.color = "#2ecc71";
+            }
         }
 
         function switchMainTab(screenId, navId) {
-            document.getElementById('lobbyScreen').classList.remove('active');
-            document.getElementById('profileScreen').classList.remove('active');
+            ['lobbyScreen', 'profileScreen', 'bankingScreen'].forEach(id => document.getElementById(id).classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
 
-            document.getElementById('navGames').classList.remove('active');
-            document.getElementById('navProfile').classList.remove('active');
-            document.getElementById(navId).classList.add('active');
+            if(navId) {
+                ['navGames', 'navProfile'].forEach(id => document.getElementById(id).classList.remove('active'));
+                document.getElementById(navId).classList.add('active');
+                document.getElementById('bottomNav').style.display = 'flex';
+            } else {
+                document.getElementById('bottomNav').style.display = 'none';
+            }
+        }
+
+        // --- 4. BANKING SYSTEM (SUPABASE) ---
+        function openBanking(type) {
+            currentTxType = type;
+            switchMainTab('bankingScreen', null);
+            document.getElementById('bankingTitle').innerText = type === 'withdraw' ? 'Withdraw Funds' : 'Deposit Funds';
+            document.getElementById('txTypeTitle').innerText = type === 'withdraw' ? 'Withdraw Amount' : 'Deposit Amount';
+            document.getElementById('txBtn').innerText = type === 'withdraw' ? 'Request Withdrawal' : 'Proceed to Deposit';
+            document.getElementById('txBalance').innerText = user.balance;
+
+            if(type === 'withdraw' && !user.bank_linked) {
+                document.getElementById('bankSetupSection').style.display = 'block';
+                document.getElementById('transactionSection').style.display = 'none';
+            } else {
+                document.getElementById('bankSetupSection').style.display = 'none';
+                document.getElementById('transactionSection').style.display = 'block';
+            }
+            renderHistory();
+        }
+
+        function closeBanking() { switchMainTab('profileScreen', 'navProfile'); }
+
+        async function saveBankDetails() {
+            let bAcc = document.getElementById('bankAcc').value.trim();
+            if(!bAcc) return alert("Enter Account Number!");
+            document.getElementById('btnLinkBank').innerText = "Verifying...";
+
+            // UNIQUENESS CHECK FROM SUPABASE
+            const { data: existingBank, error: err1 } = await db.from('tashan_linked_banks').select('phone').eq('account_number', bAcc).single();
+            
+            if(existingBank && existingBank.phone !== user.phone) {
+                document.getElementById('btnLinkBank').innerText = "Verify & Link Bank";
+                return alert("❌ एरर: यह बैंक अकाउंट पहले से किसी दूसरे यूजर के अकाउंट में लिंक है!");
+            }
+
+            // Insert into Bank Table
+            const { error: err2 } = await db.from('tashan_linked_banks').insert([{ account_number: bAcc, phone: user.phone }]);
+            
+            document.getElementById('btnLinkBank').innerText = "Verify & Link Bank";
+            if(err2) return alert("Error: Have you created the 'tashan_linked_banks' table in Supabase?");
+
+            user.bank_linked = true;
+            await saveUserToDB();
+            
+            alert("Bank Linked Successfully!");
+            document.getElementById('bankSetupSection').style.display = 'none';
+            document.getElementById('transactionSection').style.display = 'block';
+        }
+
+        async function processTransaction() {
+            let amt = parseInt(document.getElementById('txAmount').value);
+            if(isNaN(amt) || amt <= 0) return alert("Enter valid amount!");
+
+            let txId = 'TXN' + Date.now().toString().slice(-6);
+            let dateStr = new Date().toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+            if(currentTxType === 'withdraw') {
+                if(amt > user.balance) return alert("Insufficient Balance!");
+                user.balance -= amt;
+                user.history.unshift({ id: txId, type: 'Withdraw', amt: amt, date: dateStr, status: 'Processing' });
+                alert(`Withdrawal Request Placed!`);
+            } else {
+                user.balance += amt;
+                user.history.unshift({ id: txId, type: 'Deposit', amt: amt, date: dateStr, status: 'Success' });
+                alert(`Deposit Successful!`);
+            }
+
+            await saveUserToDB(); // Sync with Supabase
+            document.getElementById('txAmount').value = '';
+            document.getElementById('txBalance').innerText = user.balance;
+            renderHistory();
+        }
+
+        function renderHistory() {
+            let hList = document.getElementById('historyList');
+            hList.innerHTML = '';
+            if(!user.history || user.history.length === 0) return hList.innerHTML = '<p style="text-align:center; color:#64748b; font-size:12px;">No transactions found.</p>';
+
+            user.history.forEach(tx => {
+                let isDep = tx.type === 'Deposit';
+                let stClass = tx.status === 'Processing' ? 'color:#f1c40f; background:rgba(241,196,15,0.1);' : 'color:#2ecc71; background:rgba(46,204,113,0.1);';
+                
+                hList.innerHTML += `
+                    <div class="txn-item ${isDep ? 'tx-dep' : 'tx-wit'}">
+                        <div>
+                            <span class="txn-id">${tx.type}</span>
+                            <span class="txn-date">${tx.id} • ${tx.date}</span>
+                        </div>
+                        <div style="text-align:right;">
+                            <span class="txn-amt" style="color:${isDep ? '#2ecc71' : '#fff'}">${isDep ? '+' : '-'}${tx.amt} 🪙</span><br>
+                            <span class="txn-status" style="${stClass}">${tx.status}</span>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        // --- 5. GAME ENGINE ---
+        function getResultLogic(periodNum) { return (periodNum * 7 % 100) > 50 ? 'Big' : 'Small'; }
+
+        function startGameEngine() {
+            setInterval(async () => {
+                let now = new Date();
+                let startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+                let msSinceStart = now.getTime() - startOfDay;
+                
+                let periodNum = Math.floor(msSinceStart / 30000); 
+                let timeLeft = 30 - Math.floor((msSinceStart % 30000) / 1000);
+                
+                let dateStr = now.getFullYear().toString() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0');
+                let newPeriodStr = `${dateStr}-${periodNum.toString().padStart(4,'0')}`;
+                
+                document.getElementById('dispTimer').innerText = timeLeft;
+                
+                if(newPeriodStr !== currentPeriodStr) {
+                    if(currentPeriodStr !== '' && activeBet) {
+                        let result = getResultLogic(periodNum - 1);
+                        if(activeBet.choice === result) {
+                            user.balance += (activeBet.amt * 2);
+                            alert(`Result: ${result}! You WON ${activeBet.amt * 2} 🪙`);
+                        } else {
+                            alert(`Result: ${result}. You LOST ${activeBet.amt} 🪙`);
+                        }
+                        await saveUserToDB(); // Sync winnings to Supabase
+                        activeBet = null;
+                    }
+                    currentPeriodStr = newPeriodStr;
+                    document.getElementById('dispPeriod').innerText = currentPeriodStr;
+                    document.getElementById('betStatus').innerText = "Place your points now!";
+                    document.getElementById('betStatus').style.color = "#94a3b8";
+                    
+                    let histDiv = document.getElementById('gameHistoryList');
+                    histDiv.innerHTML = '';
+                    for(let i=1; i<=10; i++) {
+                        if(periodNum - i < 0) break;
+                        let res = getResultLogic(periodNum - i);
+                        let color = res === 'Big' ? '#10ac84' : '#5f27cd';
+                        histDiv.innerHTML += `<div style="min-width:30px; height:30px; border-radius:50%; background:${color}; display:flex; justify-content:center; align-items:center; font-size:10px; font-weight:bold; color:white;">${res[0]}</div>`;
+                    }
+                }
+
+                let btns = document.querySelectorAll('.b-btn');
+                if(timeLeft <= 3) {
+                    btns.forEach(b => { b.disabled = true; b.style.opacity = '0.5'; });
+                    if(!activeBet) document.getElementById('betStatus').innerText = "Calculating Result...";
+                } else {
+                    if(!activeBet) btns.forEach(b => { b.disabled = false; b.style.opacity = '1'; });
+                }
+            }, 1000);
+        }
+
+        async function placeBet(choice) {
+            let amt = prompt(`Enter points to bet on ${choice}:`);
+            amt = parseInt(amt);
+            if(isNaN(amt) || amt <= 0) return;
+            if(amt > user.balance) return alert("Insufficient Balance!");
+
+            user.balance -= amt;
+            await saveUserToDB(); // Deduct balance immediately in DB
+            activeBet = { choice: choice, amt: amt };
+            
+            document.getElementById('betStatus').innerText = `Placed ${amt} on ${choice}. Waiting for result...`;
+            document.getElementById('betStatus').style.color = "#00d2d3";
+            document.querySelectorAll('.b-btn').forEach(b => { b.disabled = true; b.style.opacity = '0.5'; });
         }
     </script>
 </body>
